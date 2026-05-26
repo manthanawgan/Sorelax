@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sorelax"
+version = "1.0.0"
+description = "Autonomous project context agent — Coral + Gemini → CLAUDE.md"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "typer",
+    "rich",
+    "google-generativeai",
+    "python-dotenv",
+    "apscheduler",
+    "python-dateutil",
+]
+
+[project.scripts]
+sorelax = "sorelax_cli.main:main"
+
+[tool.setuptools]
+packages = ["agent", "sorelax_cli"]
+
+[tool.setuptools.package-dir]
+sorelax_cli = "cli"

@@ -1,0 +1,6 @@
+typer
+rich
+google-generativeai
+python-dotenv
+apscheduler
+python-dateutil
