@@ -15,7 +15,7 @@ import {
   SparkleIcon,
 } from '../lib/icons';
 
-const INSTALL_COMMAND = 'curl -fsSL https://sorelax.dev/install.sh | bash';
+const INSTALL_COMMAND = 'git clone https://github.com/your-org/sorelax.git && cd sorelax && ./install.sh';
 
 const SQL_QUERY = `-- Sorelax core query — run by Coral every 6 hours
 
@@ -114,7 +114,7 @@ export default function LandingPage() {
             transition={{ duration: 0.5, ease: 'easeOut', delay: 0.2 }}
             className="mt-5 text-lg text-text-secondary max-w-[520px]"
           >
-            Sorelax runs silently in the background, joins your GitHub, Linear, Slack, and Notion in a single SQL query, and keeps your AI coding agent permanently up to date.
+            Sorelax runs on a 6-hour schedule via Hermes Agent, joins GitHub, Linear, Slack, and Notion in a single Coral SQL query, and keeps your AI coding agent permanently up to date.
           </motion.p>
 
           {/* Install Command */}

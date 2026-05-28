@@ -23,12 +23,11 @@ MISSING=0
 need_cmd curl || MISSING=1
 need_cmd pip || MISSING=1
 need_cmd coral || {
-  echo "  Install Coral: curl -fsSL https://withcoral.com/install.sh | sh (see https://withcoral.com)"
+  echo "  Install Coral: curl -fsSL https://withcoral.com/install.sh | sh"
   MISSING=1
 }
 
 if [[ "${MISSING}" -eq 1 ]]; then
-  echo ""
   echo "Install missing tools and re-run install.sh"
   exit 1
 fi
@@ -74,37 +73,28 @@ echo "==> Setting up Hermes Agent..."
 bash "${REPO_ROOT}/hermes/setup_hermes.sh"
 
 echo ""
-echo "==> Registering Sorelax cron job with Hermes..."
-bash "${REPO_ROOT}/hermes/register_cron.sh"
+echo "==> Registering Sorelax cron job..."
+bash "${REPO_ROOT}/hermes/register_cron.sh" || echo "⚠ Cron registration skipped (configure hermes model first)"
 
-echo ""
-echo "==> Configuring Claude Code MCP integration..."
 CLAUDE_CONFIG="${HOME}/.claude/claude_code_mcp_config.json"
 if [[ ! -f "${CLAUDE_CONFIG}" ]]; then
   mkdir -p "${HOME}/.claude"
   cp "${REPO_ROOT}/hermes/claude_code_mcp_config.json" "${CLAUDE_CONFIG}"
-  echo "Claude Code MCP config written to ${CLAUDE_CONFIG}"
+  echo "✓ Claude Code MCP config → ${CLAUDE_CONFIG}"
 else
-  echo "Claude Code config already exists at ${CLAUDE_CONFIG}"
-  echo "Manually add the mcpServers from hermes/claude_code_mcp_config.json"
+  echo "ℹ Merge MCP entries from hermes/claude_code_mcp_config.json into ${CLAUDE_CONFIG}"
 fi
 
 echo ""
-echo "==> Running first Sorelax context refresh..."
+echo "==> Running first refresh..."
 cd "${REPO_ROOT}"
 export $(grep -v '^#' "${ENV_FILE}" | xargs)
-python3 agent/refresh.py || {
-  echo "⚠ First refresh failed — check tokens and 'coral source list'"
-}
+sorelax refresh || python3 agent/refresh.py || echo "⚠ First refresh failed"
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
 echo "║               SORELAX SETUP COMPLETE                     ║"
-echo "║                                                          ║"
-echo "║  1. Configure Hermes LLM:  hermes model                  ║"
-echo "║  2. Start scheduler:       hermes gateway                ║"
-echo "║  3. Open Claude Code in this repo — context is ready.    ║"
-echo "║                                                          ║"
-echo "║  sorelax refresh   — update CLAUDE.md now                ║"
-echo "║  sorelax ask \"…\"  — on-demand query                     ║"
+echo "║  1. hermes model      — configure LLM                    ║"
+echo "║  2. hermes gateway    — start 6h scheduler               ║"
+echo "║  3. sorelax refresh   — manual refresh anytime           ║"
 echo "╚══════════════════════════════════════════════════════════╝"

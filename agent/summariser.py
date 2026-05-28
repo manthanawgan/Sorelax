@@ -108,8 +108,8 @@ if __name__ == "__main__":
     rows = json.load(sys.stdin)
     context = summarise_rows(rows)
     context["updated_at"] = datetime.now(timezone.utc).isoformat()
-    context_path = Path.home() / ".sorelax" / "project_context.json"
-    context_path.parent.mkdir(parents=True, exist_ok=True)
-    context_path.write_text(json.dumps(context, indent=2), encoding="utf-8")
+    path = Path.home() / ".sorelax" / "project_context.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(context, indent=2), encoding="utf-8")
     json.dump(context, sys.stdout)
     sys.stdout.write("\n")

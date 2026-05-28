@@ -8,7 +8,7 @@
     "coral": {
       "command": "coral",
       "args": ["mcp-stdio"],
-      "description": "Coral SQL engine — query GitHub, Linear, Slack, Notion directly"
+      "description": "Coral SQL — query GitHub, Linear, Slack, Notion"
     }
   }
 }

@@ -1,5 +1,4 @@
-# Sorelax Hermes Agent config — copied to ~/.hermes/config.yaml by setup_hermes.sh
-# Replace __SORELEX_ROOT__ with the absolute path to this repository during setup.
+# Copied to ~/.hermes/config.yaml by setup_hermes.sh (__SORELEX_ROOT__ is replaced)
 
 mcp_servers:
   coral:
@@ -15,6 +14,4 @@ skills:
 cron:
   wrap_response: false
 
-# Configure your LLM provider after setup:
-#   hermes model
-# (e.g. OpenRouter, Nous Portal, or paste an API key)
+# Configure LLM after setup: hermes model

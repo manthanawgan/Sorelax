@@ -3,25 +3,18 @@ import { GitHubIcon } from '../lib/icons';
 
 const README_CONTENT = `  # Sorelax
 
-  Sorelax is an autonomous background agent that eliminates
-  the "explain your codebase" tax from every AI coding session.
-
-  It runs on a 6-hour schedule, executes a single cross-source
-  SQL JOIN across GitHub, Linear, Slack, and Notion using Coral,
-  summarises the results with Gemini API, and writes a structured
-  CLAUDE.md to your repo root so Claude Code and Cursor start
-  every session already knowing your open PRs, active bugs,
-  sprint goals, and architectural decisions.
-
-  No dashboards. No manual context-pasting. No re-explaining.
+  Autonomous project context for AI coding sessions.
+  Coral SQL → Gemini → CLAUDE.md every 6 hours.
 
   ## Install
 
-  curl -fsSL https://sorelax.dev/install.sh | bash
+  git clone …/sorelax && cd sorelax
+  ./install.sh
+  hermes model && hermes gateway
 
   ## Stack
 
-  Coral · Gemini API · Hermes Agent · Python · Rich · Typer`;
+  Coral · Gemini · Hermes Agent · Python · Typer`;
 
 const t = { duration: 0.5, ease: 'easeOut' as const };
 const t2 = { duration: 0.4, ease: 'easeOut' as const };
