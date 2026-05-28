@@ -95,3 +95,21 @@ def summarise_rows(rows: list[dict[str, Any]], *, strict: bool = False) -> dict[
             continue
 
     raise ValueError(f"Gemini returned invalid JSON after retry: {last_error}") from last_error
+
+
+if __name__ == "__main__":
+    import sys
+    from datetime import datetime, timezone
+    from pathlib import Path
+
+    from dotenv import load_dotenv
+
+    load_dotenv()
+    rows = json.load(sys.stdin)
+    context = summarise_rows(rows)
+    context["updated_at"] = datetime.now(timezone.utc).isoformat()
+    path = Path.home() / ".sorelax" / "project_context.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(context, indent=2), encoding="utf-8")
+    json.dump(context, sys.stdout)
+    sys.stdout.write("\n")

@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "hermes": {
+      "command": "hermes",
+      "args": ["mcp", "serve"],
+      "description": "Sorelax context agent — query project context, run refresh"
+    },
+    "coral": {
+      "command": "coral",
+      "args": ["mcp-stdio"],
+      "description": "Coral SQL — query GitHub, Linear, Slack, Notion"
+    }
+  }
+}

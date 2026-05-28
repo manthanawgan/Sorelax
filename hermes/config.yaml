@@ -1,0 +1,17 @@
+# Copied to ~/.hermes/config.yaml by setup_hermes.sh (__SORELEX_ROOT__ is replaced)
+
+mcp_servers:
+  coral:
+    command: coral
+    args: [mcp-stdio]
+    tools:
+      include: [sql, list_catalog, describe_table, search_catalog]
+
+skills:
+  external_dirs:
+    - __SORELEX_ROOT__/hermes/skills
+
+cron:
+  wrap_response: false
+
+# Configure LLM after setup: hermes model

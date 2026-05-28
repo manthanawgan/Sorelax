@@ -191,3 +191,11 @@ def load_logs(limit: int = 10) -> list[dict[str, Any]]:
         except json.JSONDecodeError:
             continue
     return entries
+
+
+if __name__ == "__main__":
+    import sys
+
+    load_dotenv()
+    json.dump(run_refresh(), sys.stdout, indent=2, default=str)
+    sys.stdout.write("\n")

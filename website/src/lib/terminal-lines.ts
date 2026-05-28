@@ -28,11 +28,26 @@ export const heroTerminalLines: TerminalLine[] = [
 ];
 
 export const firstRunTerminalLines: TerminalLine[] = [
+  { text: '==> Setting up Hermes Agent...', color: 'secondary', delay: 100 },
+  { text: '✓ Cron: Sorelax 6h Context Refresh', color: 'green', delay: 100 },
   { text: '[Sorelax] Querying GitHub, Linear, Slack, Notion via Coral...', color: 'secondary', delay: 100 },
   { text: '[Sorelax] 4 sources joined. 94 rows returned.', color: 'white', delay: 100 },
   { text: '[Sorelax] Summarising with Gemini...', color: 'secondary', delay: 100 },
   { text: '[Sorelax] Done. CLAUDE.md written.', color: 'green', delay: 100 },
-  { text: '[Sorelax] Next refresh in 6h 00m.', color: 'green', delay: 100 },
+  { text: 'Next: hermes gateway  (starts 6h scheduler)', color: 'green', delay: 100 },
+];
+
+export const hermesGatewayLines: TerminalLine[] = [
+  { text: '$ hermes gateway', color: 'tertiary', delay: 100 },
+  { text: '[Hermes] Gateway started. 1 cron job active.', color: 'green', delay: 300 },
+  { text: '[Hermes] Next: Sorelax 6h Context Refresh in 5h 58m', color: 'secondary', delay: 200 },
+];
+
+export const hermesCronRunLines: TerminalLine[] = [
+  { text: '$ hermes cron run abc123', color: 'tertiary', delay: 100 },
+  { text: '[Hermes] Loading skill: sorelex-refresh', color: 'secondary', delay: 400 },
+  { text: '[Hermes] mcp_coral_sql → 94 rows', color: 'white', delay: 600 },
+  { text: '[Hermes] CLAUDE.md updated.', color: 'green', delay: 300 },
 ];
 
 export const refreshCommandLines: TerminalLine[] = [
@@ -86,6 +101,6 @@ export const logsCommandLines: TerminalLine[] = [
 
 export const startStopCommandLines: TerminalLine[] = [
   { text: '$ sorelax start', color: 'tertiary', delay: 100 },
-  { text: '[Sorelax] Daemon started.', color: 'green', delay: 300 },
-  { text: '[Sorelax] Scheduled refresh every 6 hours.', color: 'secondary', delay: 200 },
+  { text: '[Sorelax] APScheduler daemon started (fallback).', color: 'green', delay: 300 },
+  { text: '[Sorelax] Prefer: hermes gateway for production scheduling.', color: 'secondary', delay: 200 },
 ];

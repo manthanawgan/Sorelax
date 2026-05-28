@@ -9,6 +9,8 @@ import {
   statusCommandLines,
   logsCommandLines,
   startStopCommandLines,
+  hermesGatewayLines,
+  hermesCronRunLines,
 } from '../lib/terminal-lines';
 
 interface NavSection {
@@ -23,14 +25,16 @@ const navSections: NavSection[] = [
       { id: 'installation', label: 'Installation' },
       { id: 'api-tokens', label: 'API tokens' },
       { id: 'first-run', label: 'First run' },
+      { id: 'hermes-setup', label: 'Hermes setup' },
     ],
   },
   {
     title: 'Configuration',
     items: [
       { id: 'environment-variables', label: 'Environment variables' },
-      { id: 'changing-refresh-interval', label: 'Changing refresh interval' },
+      { id: 'changing-refresh-interval', label: 'Refresh interval' },
       { id: 'customising-sources', label: 'Customising sources' },
+      { id: 'mcp-integration', label: 'MCP integration' },
     ],
   },
   {
@@ -40,8 +44,14 @@ const navSections: NavSection[] = [
       { id: 'sorelax-ask', label: 'sorelax ask' },
       { id: 'sorelax-status', label: 'sorelax status' },
       { id: 'sorelax-logs', label: 'sorelax logs' },
-      { id: 'sorelax-start', label: 'sorelax start' },
-      { id: 'sorelax-stop', label: 'sorelax stop' },
+      { id: 'sorelax-start', label: 'sorelax start / stop' },
+    ],
+  },
+  {
+    title: 'Hermes Agent',
+    items: [
+      { id: 'hermes-gateway', label: 'Gateway & cron' },
+      { id: 'hermes-skill', label: 'sorelex-refresh skill' },
     ],
   },
   {
@@ -50,7 +60,7 @@ const navSections: NavSection[] = [
       { id: 'the-coral-sql-query', label: 'The Coral SQL query' },
       { id: 'gemini-summarisation', label: 'Gemini summarisation' },
       { id: 'claude-md-output', label: 'CLAUDE.md output' },
-      { id: 'hermes-agent-memory', label: 'Hermes Agent memory' },
+      { id: 'storage-and-memory', label: 'Storage & memory' },
     ],
   },
   {
@@ -59,6 +69,7 @@ const navSections: NavSection[] = [
       { id: 'slack-auth-issues', label: 'Slack auth issues' },
       { id: 'source-not-found', label: 'Source not found' },
       { id: 'gemini-errors', label: 'Gemini errors' },
+      { id: 'hermes-troubleshooting', label: 'Hermes issues' },
     ],
   },
 ];
@@ -180,17 +191,32 @@ export default function DocsPage() {
           <div ref={(el) => setSectionRef('installation', el)} id="installation" className="mb-12 scroll-mt-[88px]">
             <h3 className="text-xl font-semibold text-white mb-4">Installation</h3>
             <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
-              Sorelax installs everything in one command. You'll need curl on macOS or Linux.
+              Clone the repo and run the installer. You need Python 3.10+, curl, and Coral on PATH. Hermes Agent is installed automatically if missing.
             </p>
-            <CodeBlock code="curl -fsSL https://sorelax.dev/install.sh | bash" className="mb-6" />
+            <CodeBlock
+              code={`git clone https://github.com/your-org/sorelax.git
+cd sorelax
+./install.sh`}
+              className="mb-6"
+            />
+            <p className="text-text-secondary text-[15px] leading-relaxed mb-4">Prerequisites (install separately if needed):</p>
+            <CodeBlock
+              code={`# Coral
+curl -fsSL https://withcoral.com/install.sh | sh
+
+# Hermes (optional — install.sh installs it)
+curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scripts/install.sh | bash`}
+              className="mb-6"
+            />
             <p className="text-text-secondary text-[15px] leading-relaxed mb-4">The installer will:</p>
             <ul className="space-y-2 mb-6">
               {[
-                'Install Coral via curl',
-                'Install Hermes Agent and Python dependencies',
-                'Walk you through adding your API tokens',
-                'Connect all four data sources',
-                'Run your first context refresh automatically',
+                'Install Python dependencies (editable `sorelax` package)',
+                'Create ~/.sorelax/ and write .env in the repo root',
+                'Connect GitHub, Linear, Slack, and Notion Coral sources',
+                'Configure Hermes (Coral MCP, sorelex-refresh skill, 6h cron)',
+                'Optionally write Claude Code MCP config',
+                'Run the first context refresh',
               ].map((item) => (
                 <li key={item} className="flex items-start gap-3 text-[15px] text-text-secondary">
                   <span className="text-success mt-1 flex-shrink-0">
@@ -208,7 +234,7 @@ export default function DocsPage() {
           <div ref={(el) => setSectionRef('api-tokens', el)} id="api-tokens" className="mb-12 scroll-mt-[88px]">
             <h3 className="text-xl font-semibold text-white mb-4">API tokens</h3>
             <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
-              You need five tokens. The installer will ask for each one interactively.
+              You need six values. The installer prompts for each and saves them to <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">.env</code> in the repo root.
             </p>
 
             {/* Token table */}
@@ -217,18 +243,20 @@ export default function DocsPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-border bg-surface/50">
-                      <th className="text-left px-4 py-3 text-text-secondary font-medium">Token</th>
+                      <th className="text-left px-4 py-3 text-text-secondary font-medium">Variable</th>
                       <th className="text-left px-4 py-3 text-text-secondary font-medium">Where to get it</th>
-                      <th className="text-left px-4 py-3 text-text-secondary font-medium">Required scope</th>
+                      <th className="text-left px-4 py-3 text-text-secondary font-medium">Notes</th>
                     </tr>
                   </thead>
                   <tbody>
                     {[
-                      { token: 'GITHUB_TOKEN', url: 'github.com/settings/tokens', scope: 'repo, read:org' },
-                      { token: 'LINEAR_API_KEY', url: 'linear.app/settings/api', scope: 'read access' },
-                      { token: 'SLACK_BOT_TOKEN', url: 'api.slack.com/apps', scope: 'channels:read messages:read' },
-                      { token: 'NOTION_TOKEN', url: 'notion.so/my-integrations', scope: 'read content' },
-                      { token: 'GEMINI_API_KEY', url: 'aistudio.google.com', scope: 'full access' },
+                      { token: 'GITHUB_OWNER', url: 'your org or username', scope: 'required for SQL filters' },
+                      { token: 'GITHUB_REPO', url: 'repository name', scope: 'required for SQL filters' },
+                      { token: 'GITHUB_TOKEN', url: 'github.com/settings/tokens', scope: 'repo, read:org — Coral source' },
+                      { token: 'LINEAR_API_KEY', url: 'linear.app/settings/api', scope: 'read — Coral source' },
+                      { token: 'SLACK_TOKEN', url: 'api.slack.com/apps', scope: 'xoxb-… bot token — Coral source' },
+                      { token: 'NOTION_TOKEN', url: 'notion.so/my-integrations', scope: 'read — Coral source' },
+                      { token: 'GEMINI_API_KEY', url: 'aistudio.google.com', scope: 'required for summarisation' },
                     ].map((row, i, arr) => (
                       <tr key={row.token} className={i < arr.length - 1 ? 'border-b border-border' : ''}>
                         <td className="px-4 py-3 font-mono text-xs text-white">{row.token}</td>
@@ -242,7 +270,7 @@ export default function DocsPage() {
             </div>
 
             <InfoBox>
-              Tokens are stored locally in <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">~/.sorelax/.env</code> and in Coral's local secrets store. They are never sent anywhere except to their respective APIs.
+              Tokens live in <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">.env</code> at the repo root and in Coral&apos;s local source store. They are only sent to GitHub, Linear, Slack, Notion, and Google (Gemini).
             </InfoBox>
           </div>
 
@@ -250,7 +278,7 @@ export default function DocsPage() {
           <div ref={(el) => setSectionRef('first-run', el)} id="first-run" className="mb-12 scroll-mt-[88px]">
             <h3 className="text-xl font-semibold text-white mb-4">First run</h3>
             <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
-              After installation, Sorelax runs automatically. You should see:
+              After <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">./install.sh</code>, the first refresh runs immediately. You should see:
             </p>
             <div className="mb-6">
               <Terminal
@@ -261,9 +289,26 @@ export default function DocsPage() {
                 showWindowDots={false}
               />
             </div>
-            <p className="text-text-secondary text-[15px] leading-relaxed">
-              Open your repo in Claude Code or Cursor. Your AI coding agent will read CLAUDE.md automatically and start the session already knowing your project state.
+            <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
+              <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">CLAUDE.md</code> appears in the repo root. Open the repo in Claude Code or Cursor — the agent reads it at session start.
             </p>
+            <p className="text-text-secondary text-[15px] leading-relaxed">
+              For automatic 6-hour updates, complete Hermes setup below and run <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">hermes gateway</code>.
+            </p>
+          </div>
+
+          <div ref={(el) => setSectionRef('hermes-setup', el)} id="hermes-setup" className="mb-12 scroll-mt-[88px]">
+            <h3 className="text-xl font-semibold text-white mb-4">Hermes setup</h3>
+            <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
+              Hermes Agent is the recommended scheduler. After install:
+            </p>
+            <CodeBlock
+              code={`hermes model          # choose LLM provider (OpenRouter, Nous Portal, etc.)
+hermes cron list      # confirm "Sorelax 6h Context Refresh"
+hermes gateway        # start daemon — keep running`}
+              className="mb-4"
+            />
+            <Terminal lines={hermesGatewayLines} title="hermes gateway" loop={false} showWindowDots={false} />
           </div>
         </section>
 
@@ -274,28 +319,37 @@ export default function DocsPage() {
           <div ref={(el) => setSectionRef('environment-variables', el)} id="environment-variables" className="mb-12 scroll-mt-[88px]">
             <h3 className="text-xl font-semibold text-white mb-4">Environment variables</h3>
             <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
-              Sorelax reads configuration from <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">~/.sorelax/.env</code>. You can edit this file directly or use the CLI.
+              Sorelax reads <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">.env</code> in the repo root (created by <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">install.sh</code>). Copy from <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">.env.example</code> for manual setup.
             </p>
             <CodeBlock
-              code={`# ~/.sorelax/.env
+              code={`# .env (repo root)
+GITHUB_OWNER=your-org
+GITHUB_REPO=your-repo
 GITHUB_TOKEN=ghp_xxxxxxxxxxxx
 LINEAR_API_KEY=lin_api_xxxxxxxx
-SLACK_BOT_TOKEN=xoxb-xxxxxxxxxx
+SLACK_TOKEN=xoxb-xxxxxxxxxx
 NOTION_TOKEN=secret_xxxxxxxxxx
-GEMINI_API_KEY=AIzaSyxxxxxxxxxx
-REPO_PATH=/Users/you/code/your-project`}
+GEMINI_API_KEY=AIzaSyxxxxxxxxxx`}
               className="mb-4"
             />
           </div>
 
           <div ref={(el) => setSectionRef('changing-refresh-interval', el)} id="changing-refresh-interval" className="mb-12 scroll-mt-[88px]">
-            <h3 className="text-xl font-semibold text-white mb-4">Changing refresh interval</h3>
+            <h3 className="text-xl font-semibold text-white mb-4">Refresh interval</h3>
             <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
-              The default refresh interval is 6 hours. To change it, set the <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">REFRESH_INTERVAL_HOURS</code> environment variable:
+              Default: every 6 hours via Hermes cron (<code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">0 */6 * * *</code>). To change it, create a new job:
             </p>
-            <CodeBlock code="echo 'REFRESH_INTERVAL_HOURS=2' >> ~/.sorelax/.env" className="mb-4" />
+            <CodeBlock
+              code={`hermes cron list
+# Create e.g. every 2 hours (remove old job if needed):
+hermes cron create "0 */2 * * *" "Run Sorelax refresh…" \\
+  --skill sorelex-refresh \\
+  --name "Sorelax 2h refresh" \\
+  --workdir "$(pwd)"`}
+              className="mb-4"
+            />
             <p className="text-text-secondary text-[15px] leading-relaxed">
-              Then restart the daemon with <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">sorelax stop && sorelax start</code>.
+              Fallback: <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">sorelax start</code> uses APScheduler with a fixed 6h interval in <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">cli/scheduler.py</code>.
             </p>
           </div>
 
@@ -315,6 +369,26 @@ coral source add --interactive slack
 coral source list`}
               className="mb-4"
             />
+          </div>
+
+          <div ref={(el) => setSectionRef('mcp-integration', el)} id="mcp-integration" className="mb-12 scroll-mt-[88px]">
+            <h3 className="text-xl font-semibold text-white mb-4">MCP integration</h3>
+            <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
+              Sorelax registers two MCP servers for Claude Code: <strong className="text-white font-medium">Coral</strong> (SQL) and <strong className="text-white font-medium">Hermes</strong> (context agent).
+            </p>
+            <CodeBlock
+              code={`# ~/.claude/claude_code_mcp_config.json (or merge from hermes/claude_code_mcp_config.json)
+{
+  "mcpServers": {
+    "hermes": { "command": "hermes", "args": ["mcp", "serve"] },
+    "coral": { "command": "coral", "args": ["mcp-stdio"] }
+  }
+}`}
+              className="mb-4"
+            />
+            <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
+              Hermes loads Coral from <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">~/.hermes/config.yaml</code> for scheduled jobs (<code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">mcp_coral_sql</code>, etc.). Restart Claude Code after editing MCP config.
+            </p>
           </div>
         </section>
 
@@ -364,29 +438,45 @@ coral source list`}
 
           {/* sorelax start/stop */}
           <div ref={(el) => setSectionRef('sorelax-start', el)} id="sorelax-start" className="mb-12 scroll-mt-[88px]">
-            <h3 className="text-xl font-semibold text-white mb-4">sorelax start</h3>
+            <h3 className="text-xl font-semibold text-white mb-4">sorelax start / stop</h3>
             <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
-              Starts the background scheduler daemon that runs <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">sorelax refresh</code> every 6 hours automatically.
+              Local APScheduler fallback (PID in <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">~/.sorelax/sorelax.pid</code>). Prefer <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">hermes gateway</code> for production.
             </p>
-            <CodeBlock code="sorelax start" className="mb-4" />
+            <CodeBlock code={`sorelax start\nsorelax stop`} className="mb-4" />
             <Terminal lines={startStopCommandLines} title="sorelax start" loop={false} showWindowDots={false} />
           </div>
+        </section>
 
-          <div ref={(el) => setSectionRef('sorelax-stop', el)} id="sorelax-stop" className="mb-12 scroll-mt-[88px]">
-            <h3 className="text-xl font-semibold text-white mb-4">sorelax stop</h3>
+        {/* ─── HERMES AGENT ─── */}
+        <section className="mb-16">
+          <h2 className="text-xs uppercase tracking-[0.12em] text-[#333333] font-medium mb-6">Hermes Agent</h2>
+
+          <div ref={(el) => setSectionRef('hermes-gateway', el)} id="hermes-gateway" className="mb-12 scroll-mt-[88px]">
+            <h3 className="text-xl font-semibold text-white mb-4">Gateway & cron</h3>
             <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
-              Stops the background scheduler daemon.
+              <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">hermes gateway</code> runs scheduled jobs from <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">~/.hermes/cron/jobs.json</code>. Install registers <strong className="text-white font-medium">Sorelax 6h Context Refresh</strong> with <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">--workdir</code> set to your repo so <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">CLAUDE.md</code> lands in the right place.
             </p>
-            <CodeBlock code="sorelax stop" className="mb-4" />
-            <Terminal
-              lines={[
-                { text: '$ sorelax stop', color: 'tertiary', delay: 100 },
-                { text: '[Sorelax] Daemon stopped.', color: 'green', delay: 300 },
-              ]}
-              title="sorelax stop"
-              loop={false}
-              showWindowDots={false}
+            <CodeBlock
+              code={`hermes cron list
+hermes cron run <job_id>
+hermes cron pause <job_id>
+hermes cron resume <job_id>`}
+              className="mb-4"
             />
+            <Terminal lines={hermesCronRunLines} title="manual cron run" loop={false} showWindowDots={false} />
+          </div>
+
+          <div ref={(el) => setSectionRef('hermes-skill', el)} id="hermes-skill" className="mb-12 scroll-mt-[88px]">
+            <h3 className="text-xl font-semibold text-white mb-4">sorelex-refresh skill</h3>
+            <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
+              Skill definition: <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">hermes/skills/sorelex-refresh/SKILL.md</code>. Hermes loads it when the cron job runs with <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">--skill sorelex-refresh</code>.
+            </p>
+            <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
+              Pipeline: <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">mcp_coral_sql</code> → <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">agent/summariser.py</code> → <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">agent/generate_context.py</code> → <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">CLAUDE.md</code>.
+            </p>
+            <InfoBox>
+              Cron sessions are isolated — each run must load <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">.env</code> and include full script paths. Re-run <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">bash hermes/register_cron.sh</code> after moving the repo.
+            </InfoBox>
           </div>
         </section>
 
@@ -424,13 +514,18 @@ coral source list`}
             </p>
           </div>
 
-          <div ref={(el) => setSectionRef('hermes-agent-memory', el)} id="hermes-agent-memory" className="mb-12 scroll-mt-[88px]">
-            <h3 className="text-xl font-semibold text-white mb-4">Hermes Agent memory</h3>
+          <div ref={(el) => setSectionRef('storage-and-memory', el)} id="storage-and-memory" className="mb-12 scroll-mt-[88px]">
+            <h3 className="text-xl font-semibold text-white mb-4">Storage & memory</h3>
             <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
-              Hermes Agent is the background scheduler that powers Sorelax. It manages the refresh cycle, handles API retries, and maintains local state between runs.
+              <strong className="text-white font-medium">Sorelax</strong> persists structured context and refresh logs:
             </p>
+            <ul className="space-y-2 mb-4 text-[15px] text-text-secondary list-disc pl-5">
+              <li><code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">~/.sorelax/project_context.json</code> — Gemini snapshot</li>
+              <li><code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">~/.sorelax/project_log.jsonl</code> — refresh history</li>
+              <li><code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">CLAUDE.md</code> — human-readable output in the repo</li>
+            </ul>
             <p className="text-text-secondary text-[15px] leading-relaxed">
-              The agent stores its state in <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">~/.sorelax/</code>, including logs, cached tokens, and the last refresh timestamp. This means Sorelax survives reboots and continues scheduling automatically.
+              <strong className="text-white font-medium">Hermes</strong> stores config in <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">~/.hermes/</code> (config, cron jobs, skills, memory). Scheduled runs can write completion notes to Hermes memory.
             </p>
           </div>
         </section>
@@ -465,12 +560,32 @@ coral source add --interactive notion`}
           <div ref={(el) => setSectionRef('gemini-errors', el)} id="gemini-errors" className="mb-12 scroll-mt-[88px]">
             <h3 className="text-xl font-semibold text-white mb-4">Gemini errors</h3>
             <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
-              If Gemini summarisation fails, Sorelax will still write the raw joined data to CLAUDE.md so your agent has context. Check your API key and rate limits:
+              Sorelax retries once with a stricter JSON prompt. If it still fails, check <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">GEMINI_API_KEY</code> and rate limits, then run <code className="font-mono text-xs text-text-primary bg-code-bg px-1 py-0.5 rounded">sorelax refresh</code>.
             </p>
-            <CodeBlock code="sorelax status" className="mb-4" />
             <InfoBox>
-              Gemini API has rate limits. If you hit them frequently, consider increasing the refresh interval to 12 hours.
+              Reduce refresh frequency via Hermes cron (e.g. every 12h) if you hit Gemini rate limits often.
             </InfoBox>
+          </div>
+
+          <div ref={(el) => setSectionRef('hermes-troubleshooting', el)} id="hermes-troubleshooting" className="mb-12 scroll-mt-[88px]">
+            <h3 className="text-xl font-semibold text-white mb-4">Hermes issues</h3>
+            <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
+              Common fixes:
+            </p>
+            <CodeBlock
+              code={`# Reinstall / configure Hermes
+bash hermes/setup_hermes.sh
+hermes model
+
+# Cron not firing — is gateway running?
+hermes gateway
+
+# Re-register cron after repo move
+bash hermes/register_cron.sh
+
+# No mcp_coral_sql — check ~/.hermes/config.yaml has coral MCP`}
+              className="mb-4"
+            />
           </div>
         </section>
       </div>
