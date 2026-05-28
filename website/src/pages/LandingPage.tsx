@@ -159,7 +159,7 @@ export default function LandingPage() {
 
             {/* Small text below command */}
             <p className="mt-3 text-xs text-text-tertiary">
-              Works on macOS and Linux · Requires Homebrew
+              Works on macOS and Linux · Requires curl
             </p>
           </motion.div>
 

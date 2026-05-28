@@ -180,13 +180,13 @@ export default function DocsPage() {
           <div ref={(el) => setSectionRef('installation', el)} id="installation" className="mb-12 scroll-mt-[88px]">
             <h3 className="text-xl font-semibold text-white mb-4">Installation</h3>
             <p className="text-text-secondary text-[15px] leading-relaxed mb-4">
-              Sorelax installs everything in one command. You'll need Homebrew on macOS or Linux.
+              Sorelax installs everything in one command. You'll need curl on macOS or Linux.
             </p>
             <CodeBlock code="curl -fsSL https://sorelax.dev/install.sh | bash" className="mb-6" />
             <p className="text-text-secondary text-[15px] leading-relaxed mb-4">The installer will:</p>
             <ul className="space-y-2 mb-6">
               {[
-                'Install Coral via Homebrew',
+                'Install Coral via curl',
                 'Install Hermes Agent and Python dependencies',
                 'Walk you through adding your API tokens',
                 'Connect all four data sources',

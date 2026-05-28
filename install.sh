@@ -21,10 +21,10 @@ need_cmd() {
 echo ""
 echo "Checking dependencies..."
 MISSING=0
-need_cmd brew || MISSING=1
+need_cmd curl || MISSING=1
 need_cmd pip || MISSING=1
 need_cmd coral || {
-  echo "  Install Coral: brew install coral (see https://withcoral.com)"
+  echo "  Install Coral: curl -fsSL https://withcoral.com/install.sh | sh (see https://withcoral.com)"
   MISSING=1
 }
 need_cmd hermes || {
