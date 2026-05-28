@@ -3,8 +3,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="${REPO_ROOT}/.env"
-SORELAX_HOME="${HOME}/.sorelax"
-HERMES_SKILLS="${HOME}/.hermes/skills"
+SORELEX_HOME="${HOME}/.sorelax"
 
 echo "╔══════════════════════════════════════════════════════════╗"
 echo "║              SORELAX — Installation                      ║"
@@ -27,9 +26,6 @@ need_cmd coral || {
   echo "  Install Coral: brew install coral (see https://withcoral.com)"
   MISSING=1
 }
-need_cmd hermes || {
-  echo "  Hermes optional for skills; continuing without hermes CLI is ok if dir exists"
-}
 
 if [[ "${MISSING}" -eq 1 ]]; then
   echo ""
@@ -41,14 +37,8 @@ echo ""
 echo "Installing Python package..."
 pip install -e "${REPO_ROOT}"
 
-mkdir -p "${SORELAX_HOME}"
-echo "✓ Created ${SORELAX_HOME}"
-
-if [[ -d "${REPO_ROOT}/skills" ]]; then
-  mkdir -p "${HERMES_SKILLS}"
-  cp -r "${REPO_ROOT}/skills/"* "${HERMES_SKILLS}/" 2>/dev/null || true
-  echo "✓ Copied skill files to ${HERMES_SKILLS}"
-fi
+mkdir -p "${SORELEX_HOME}"
+echo "✓ Created ${SORELEX_HOME}"
 
 echo ""
 echo "Configure tokens (saved to .env):"
@@ -80,18 +70,41 @@ coral source add slack --token "${SLACK_TOKEN}" 2>/dev/null || coral source add 
 coral source add notion --token "${NOTION_TOKEN}" 2>/dev/null || coral source add notion || true
 
 echo ""
-echo "Running first refresh..."
+echo "==> Setting up Hermes Agent..."
+bash "${REPO_ROOT}/hermes/setup_hermes.sh"
+
+echo ""
+echo "==> Registering Sorelax cron job with Hermes..."
+bash "${REPO_ROOT}/hermes/register_cron.sh"
+
+echo ""
+echo "==> Configuring Claude Code MCP integration..."
+CLAUDE_CONFIG="${HOME}/.claude/claude_code_mcp_config.json"
+if [[ ! -f "${CLAUDE_CONFIG}" ]]; then
+  mkdir -p "${HOME}/.claude"
+  cp "${REPO_ROOT}/hermes/claude_code_mcp_config.json" "${CLAUDE_CONFIG}"
+  echo "Claude Code MCP config written to ${CLAUDE_CONFIG}"
+else
+  echo "Claude Code config already exists at ${CLAUDE_CONFIG}"
+  echo "Manually add the mcpServers from hermes/claude_code_mcp_config.json"
+fi
+
+echo ""
+echo "==> Running first Sorelax context refresh..."
 cd "${REPO_ROOT}"
 export $(grep -v '^#' "${ENV_FILE}" | xargs)
-sorelax refresh || {
+python3 agent/refresh.py || {
   echo "⚠ First refresh failed — check tokens and 'coral source list'"
 }
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
-echo "║  Sorelax installed successfully!                         ║"
+echo "║               SORELAX SETUP COMPLETE                     ║"
+echo "║                                                          ║"
+echo "║  1. Configure Hermes LLM:  hermes model                  ║"
+echo "║  2. Start scheduler:       hermes gateway                ║"
+echo "║  3. Open Claude Code in this repo — context is ready.    ║"
 echo "║                                                          ║"
 echo "║  sorelax refresh   — update CLAUDE.md now                ║"
 echo "║  sorelax ask \"…\"  — on-demand query                     ║"
-echo "║  sorelax start     — daemon every 6h                     ║"
 echo "╚══════════════════════════════════════════════════════════╝"
