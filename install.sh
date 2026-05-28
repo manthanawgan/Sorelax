@@ -24,8 +24,36 @@ MISSING=0
 need_cmd brew || MISSING=1
 need_cmd pip || MISSING=1
 need_cmd coral || {
-  echo "  Install Coral: brew install coral (see https://withcoral.com)"
-  MISSING=1
+  echo ""
+  echo "Coral not found."
+  echo "Installing Coral automatically..."
+
+  if curl -fsSL https://withcoral.com/install.sh | bash; then
+    echo "✓ Coral installed successfully"
+
+    export PATH="$HOME/.local/bin:$PATH"
+
+    if ! grep -q '.local/bin' ~/.zshrc 2>/dev/null; then
+      echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+    fi
+
+    if ! grep -q '.local/bin' ~/.bashrc 2>/dev/null; then
+      echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+    fi
+
+    hash -r
+
+    if ! command -v coral >/dev/null 2>&1; then
+      echo "✗ Coral installation completed but command not found"
+      echo "Restart terminal and rerun install.sh"
+      exit 1
+    fi
+  else
+    echo "✗ Failed to install Coral"
+    echo "Try manually:"
+    echo "curl -fsSL https://withcoral.com/install.sh | bash"
+    exit 1
+  fi
 }
 need_cmd hermes || {
   echo "  Hermes optional for skills; continuing without hermes CLI is ok if dir exists"
