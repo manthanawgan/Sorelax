@@ -7,7 +7,9 @@ import os
 import re
 from typing import Any
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
+
 
 SUMMARY_KEYS = (
     "active_work",
@@ -40,7 +42,7 @@ def _configure_gemini() -> genai.GenerativeModel:
     if not api_key:
         raise ValueError("Missing GEMINI_API_KEY in environment")
     genai.configure(api_key=api_key)
-    return genai.GenerativeModel("gemini-1.5-flash")
+    return genai.GenerativeModel("gemini-2.5-flash")
 
 
 def _extract_json(text: str) -> dict[str, Any]:
