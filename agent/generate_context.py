@@ -63,3 +63,11 @@ def write_claude_md(
     out_file = out_dir / "CLAUDE.md"
     out_file.write_text(format_claude_md(context), encoding="utf-8")
     return out_file
+
+
+if __name__ == "__main__":
+    from dotenv import load_dotenv
+
+    load_dotenv()
+    path = write_claude_md()
+    print(path)

@@ -1,6 +1,6 @@
 typer
 rich
-google-generativeai
+google-genai
 python-dotenv
 apscheduler
 python-dateutil
