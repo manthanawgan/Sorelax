@@ -69,4 +69,5 @@ if __name__ == "__main__":
     from dotenv import load_dotenv
 
     load_dotenv()
-    print(write_claude_md())
+    path = write_claude_md()
+    print(path)
