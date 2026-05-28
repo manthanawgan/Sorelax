@@ -60,6 +60,6 @@ cli/     # Rich UI + Typer commands (installed as python package "sorelax_cli")
 coral source list
 ```
 
-- **Coral not found**: ensure `coral` is on PATH (or install via Homebrew).
+- **Coral not found**: ensure `coral` is on PATH (or install via curl: `curl -fsSL https://withcoral.com/install.sh | sh`).
 - **MCP (optional)**: Coral can run as an MCP stdio server via `coral mcp-stdio` (see `coral.md`).
 
