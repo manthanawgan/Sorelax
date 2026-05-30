@@ -19,6 +19,7 @@ from agent.refresh import (
     QUERIES_DIR,
     load_context,
     load_logs,
+    load_on_demand_queries,
     run_refresh,
 )
 from sorelax_cli import display
@@ -145,12 +146,12 @@ def ask(question: str = typer.Argument(..., help="Natural-language question")) -
         raise typer.Exit(1)
 
     keyword = _extract_keyword(question)
-    sql_path = QUERIES_DIR / "on_demand.sql"
-    sql = sql_path.read_text(encoding="utf-8")
-    sql = sql.replace("{owner}", owner).replace("{repo}", repo).replace("{keyword}", keyword)
+    # Coral does not support UNION; on_demand.sql is split into 5 part files
+    # executed separately by coral_query(), merged in Python.
+    sql_parts = load_on_demand_queries(owner=owner, repo=repo, keyword=keyword)
 
     try:
-        rows = coral_query(sql)
+        rows = coral_query(sql_parts)
         display.show_ask_result(question, rows)
         display.console.print(f"\n[dim]Keyword: {keyword}[/dim]")
     except RuntimeError as exc:

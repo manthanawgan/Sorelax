@@ -15,12 +15,15 @@ dependencies = [
     "python-dotenv",
     "apscheduler",
     "python-dateutil",
+    "fastapi",
+    "uvicorn[standard]",
 ]
 
 [project.scripts]
 sorelax = "sorelax_cli.main:main"
 sorelax-website = "sorelax_cli.website:main"
 sorelax-gui = "gui.main:launch"
+sorelax-api = "agent.api:start"
 
 [tool.setuptools]
 packages = ["agent", "sorelax_cli", "gui"]

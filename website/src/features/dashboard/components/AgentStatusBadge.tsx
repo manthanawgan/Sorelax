@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import type { AgentState } from '../types';
+import type { AgentState } from '@/lib/types/status';
 
 const STATE_CONFIG: Record<
   AgentState,
