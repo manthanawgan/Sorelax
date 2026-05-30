@@ -50,7 +50,7 @@ export default function GitHubPage() {
         className="mb-12"
       >
         <a
-          href="https://github.com/your-org/sorelax"
+          href="https://github.com/manthanawgan/Sorelax"
           target="_blank"
           rel="noopener noreferrer"
           className="block w-full py-4 px-6 rounded-card bg-white text-black text-center font-medium hover:bg-[#e5e5e5] transition-colors duration-200"

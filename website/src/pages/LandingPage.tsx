@@ -15,7 +15,7 @@ import {
   SparkleIcon,
 } from '../lib/icons';
 
-const INSTALL_COMMAND = 'git clone https://github.com/your-org/sorelax.git && cd sorelax && ./install.sh';
+const INSTALL_COMMAND = 'git clone https://github.com/manthanawgan/Sorelax.git && cd sorelax && ./install.sh';
 
 const SQL_QUERY = `-- Sorelax core query — run by Coral every 6 hours
 

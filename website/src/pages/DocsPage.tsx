@@ -194,7 +194,7 @@ export default function DocsPage() {
               Clone the repo and run the installer. You need Python 3.10+, curl, and Coral on PATH. Hermes Agent is installed automatically if missing.
             </p>
             <CodeBlock
-              code={`git clone https://github.com/your-org/sorelax.git
+              code={`git clone https://github.com/manthanawgan/sorelax.git
 cd sorelax
 ./install.sh`}
               className="mb-6"
