@@ -55,7 +55,7 @@ export function LogDetailDrawer({ entry, onClose }: LogDetailDrawerProps) {
                   {entry.status}
                 </span>
               </DetailRow>
-              <DetailRow label="Rows joined">{entry.row_count || '—'}</DetailRow>
+              <DetailRow label="Rows joined">{entry.row_count}</DetailRow>
               <DetailRow label="Source counts">
                 <span className="text-zinc-400">{formatSourceCounts(entry.source_counts)}</span>
               </DetailRow>
