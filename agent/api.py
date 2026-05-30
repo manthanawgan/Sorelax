@@ -325,8 +325,38 @@ def get_status() -> DashboardStatus:
 
 @app.get("/api/logs", response_model=list[RefreshLogEntry])
 def get_logs() -> list[RefreshLogEntry]:
-    entries = load_logs(limit=50)
-    return [_normalise_log_entry(entry) for entry in entries]
+    try:
+        result = subprocess.run(
+            ["git", "log", "-n", "50", "--pretty=format:%H|%cI|%an|%s"],
+            capture_output=True,
+            text=True,
+            cwd=str(_repo_root()),
+        )
+        if result.returncode != 0:
+            entries = load_logs(limit=50)
+            return [_normalise_log_entry(entry) for entry in entries]
+
+        entries = []
+        for line in result.stdout.strip().splitlines():
+            if not line:
+                continue
+            parts = line.split("|", 3)
+            if len(parts) < 4:
+                continue
+            sha, date_str, author, message = parts
+            entries.append(
+                RefreshLogEntry(
+                    timestamp=date_str,
+                    row_count=1,
+                    source_counts={"github_commits": 1},
+                    status="ok",
+                    warnings=[f"{message} ({author})"],
+                )
+            )
+        return entries
+    except Exception:
+        entries = load_logs(limit=50)
+        return [_normalise_log_entry(entry) for entry in entries]
 
 
 @app.post("/api/ask", response_model=AskResponse)
