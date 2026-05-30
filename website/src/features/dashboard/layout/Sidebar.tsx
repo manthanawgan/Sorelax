@@ -1,19 +1,13 @@
 import { NAV_ITEMS } from '../nav';
 import { SidebarNavItem } from '../components/SidebarNavItem';
-import { GitHubIcon, LinearIcon, NotionIcon, SlackIcon } from '@/lib/icons';
+import { SourceHealthList } from '../components/SourceHealthList';
+import { SidebarFooter } from '../components/SidebarFooter';
 import type { DashboardSection } from '../types';
 
 interface SidebarProps {
   active: DashboardSection;
   onNavigate: (section: DashboardSection) => void;
 }
-
-const SOURCE_ICONS = [
-  { name: 'GitHub', Icon: GitHubIcon, connected: true },
-  { name: 'Linear', Icon: LinearIcon, connected: true },
-  { name: 'Slack', Icon: SlackIcon, connected: true },
-  { name: 'Notion', Icon: NotionIcon, connected: false },
-] as const;
 
 export function Sidebar({ active, onNavigate }: SidebarProps) {
   return (
@@ -50,25 +44,11 @@ export function Sidebar({ active, onNavigate }: SidebarProps) {
         <p className="mb-2.5 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-700">
           Sources
         </p>
-        <div className="grid grid-cols-4 gap-1.5">
-          {SOURCE_ICONS.map(({ name, Icon, connected }) => (
-            <div
-              key={name}
-              title={`${name}: ${connected ? 'connected' : 'disconnected'}`}
-              className="group relative flex flex-col items-center gap-1 rounded-md border border-zinc-800/40 bg-zinc-950/50 px-1 py-2 transition-colors hover:border-zinc-700/60"
-            >
-              <Icon
-                size={14}
-                className={connected ? 'text-zinc-400' : 'text-zinc-700'}
-              />
-              <span
-                className={`h-1 w-1 rounded-full ${
-                  connected ? 'bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.5)]' : 'bg-zinc-700'
-                }`}
-              />
-            </div>
-          ))}
-        </div>
+        <SourceHealthList />
+      </div>
+
+      <div className="border-t border-zinc-800/50 px-4 py-4">
+        <SidebarFooter />
       </div>
     </aside>
   );
