@@ -38,6 +38,26 @@ def _load_sql(name: str, **subs: str) -> str:
     return sql
 
 
+def load_on_demand_queries(owner: str, repo: str, keyword: str) -> list[str]:
+    """Return the 5 on_demand part queries with placeholders substituted.
+
+    Coral does not support UNION / UNION ALL.  The original on_demand.sql has
+    been split into on_demand_part1.sql … on_demand_part5.sql.  Each part is
+    executed separately by coral_query() and the rows are merged in Python.
+    """
+    parts = [
+        "on_demand_part1.sql",
+        "on_demand_part2.sql",
+        "on_demand_part3.sql",
+        "on_demand_part4.sql",
+        "on_demand_part5.sql",
+    ]
+    return [
+        _load_sql(part, owner=owner, repo=repo, keyword=keyword)
+        for part in parts
+    ]
+
+
 def _check_env() -> None:
     missing = [k for k in REQUIRED_ENV if not os.getenv(k)]
     if missing:
@@ -169,7 +189,7 @@ def run_refresh(
         "warnings": warnings,
         "skill_hints": hints,
         "sources_joined": 4,
-        "sql_queries": 1,
+        "sql_queries": 5,
     }
 
 

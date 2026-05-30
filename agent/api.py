@@ -19,7 +19,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from agent.coral_client import coral_query
-from agent.refresh import QUERIES_DIR, load_context, load_logs
+from agent.refresh import QUERIES_DIR, load_context, load_logs, load_on_demand_queries
 from sorelax_cli.scheduler import INTERVAL_HOURS, _pid_running, read_pid, stop_daemon
 
 AgentState = Literal["active", "idle", "stopped", "error"]
@@ -94,7 +94,10 @@ app = FastAPI(title="Sorelax API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -342,11 +345,12 @@ def ask(body: AskRequest) -> AskResponse:
         )
 
     keyword = _extract_keyword(question)
-    sql = (QUERIES_DIR / "on_demand.sql").read_text(encoding="utf-8")
-    sql = sql.replace("{owner}", owner).replace("{repo}", repo).replace("{keyword}", keyword)
+    # Coral does not support UNION; on_demand.sql is split into 5 part files
+    # executed separately by coral_query(), merged in Python.
+    sql_parts = load_on_demand_queries(owner=owner, repo=repo, keyword=keyword)
 
     try:
-        rows = coral_query(sql)
+        rows = coral_query(sql_parts)
     except RuntimeError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 
@@ -421,7 +425,7 @@ def refresh() -> StreamingResponse:
 def start() -> None:
     import uvicorn
 
-    uvicorn.run("agent.api:app", host="127.0.0.1", port=8000, reload=False)
+    uvicorn.run("agent.api:app", host="127.0.0.1", port=8081, reload=False)
 
 
 if __name__ == "__main__":

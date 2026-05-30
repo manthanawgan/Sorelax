@@ -1,7 +1,7 @@
 import type { ZodType } from 'zod';
 import { z } from 'zod';
 
-export const API_BASE_URL = 'http://localhost:8000';
+export const API_BASE_URL = 'http://127.0.0.1:8081';
 
 export class ApiError extends Error {
   readonly status: number;
