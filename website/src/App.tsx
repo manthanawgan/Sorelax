@@ -4,10 +4,11 @@ import Footer from './components/Footer';
 import LandingPage from './pages/LandingPage';
 import DocsPage from './pages/DocsPage';
 import GitHubPage from './pages/GitHubPage';
+import { DashboardPage } from './features/dashboard/DashboardPage';
 
-function App() {
+function MarketingLayout() {
   return (
-    <div className="min-h-screen flex flex-col bg-background text-white">
+    <div className="flex min-h-screen flex-col bg-background text-white">
       <Navbar />
       <div className="flex-1">
         <Routes>
@@ -18,6 +19,15 @@ function App() {
       </div>
       <Footer />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/dashboard/*" element={<DashboardPage />} />
+      <Route path="/*" element={<MarketingLayout />} />
+    </Routes>
   );
 }
 

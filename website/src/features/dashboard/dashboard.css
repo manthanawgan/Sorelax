@@ -1,0 +1,18 @@
+/* Sorelax dashboard — industrial telemetry aesthetic */
+
+.dashboard-root {
+  --coral: #38bdb0;
+  --coral-dim: rgba(56, 189, 176, 0.12);
+}
+
+.dashboard-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 24px 24px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black 20%, transparent 70%);
+}
+
+.dashboard-root ::selection {
+  background: rgba(56, 189, 176, 0.25);
+}

@@ -19,9 +19,11 @@ dependencies = [
 
 [project.scripts]
 sorelax = "sorelax_cli.main:main"
+sorelax-website = "sorelax_cli.website:main"
+sorelax-gui = "gui.main:launch"
 
 [tool.setuptools]
-packages = ["agent", "sorelax_cli"]
+packages = ["agent", "sorelax_cli", "gui"]
 
 [tool.setuptools.package-dir]
 sorelax_cli = "cli"
