@@ -67,7 +67,59 @@ hermes gateway    # start the scheduler (keep running)
 hermes cron list  # verify "Sorelax 6h Context Refresh"
 ```
 
+## GUI (Desktop App)
+
+Sorelax ships a **PyQt6 desktop interface** — a dark, Tokyo Night themed dashboard with
+live log tailing, interactive Q&A, a context explorer, and a credential manager.
+
+### Install
+
+PyQt6 is an optional dependency (not pulled in by the base `pip install -e .`):
+
+```bash
+pip install PyQt6
+pip install -e .          # re-installs to register the sorelax-gui script
+```
+
+### Launch
+
+```bash
+sorelax-gui
+```
+
+Or directly:
+
+```bash
+python -m gui.main
+```
+
+### First-run wizard
+
+If no `.env` is found the app opens the **Setup Wizard** automatically:
+
+| Step | What happens |
+|------|-------------|
+| **1 — Dependency Check** | Verifies `curl`, `pip`, and `coral` are on PATH. Shows install command if Coral is missing. |
+| **2 — Credentials** | Collects all 7 tokens (GitHub, Linear, Slack, Notion, Gemini, …) with password echo. |
+| **3 — Install Progress** | Runs the full install pipeline in a background thread with colour-coded live output. |
+| **4 — Done** | Displays copyable `hermes model / gateway` commands and opens the main dashboard. |
+
+### Dashboard panels
+
+| Panel | Description |
+|-------|-------------|
+| **Dashboard** | Coloured source health dots, last-sync time, countdown timer, Refresh Now + Start/Stop scheduler buttons, live console |
+| **Ask Sorelax** | Natural-language Q&A streamed live from `sorelax ask`, with session history sidebar |
+| **Context Explorer** | Scrollable cards built from `~/.sorelax/project_context.json`, grouped by key |
+| **Live Logs** | Auto-scrolling tail of `~/.sorelax/project_log.jsonl` with Pause/Resume |
+| **Settings** | 7 credential fields (password mode, Show/Hide toggle), Save applies Coral sources off-thread |
+
+> **Screenshot**
+>
+> *(Add a screenshot here once the app is running — e.g. `![Dashboard](docs/screenshot_dashboard.png)`)*
+
 ## Usage
+
 
 ### Sorelax CLI
 

@@ -5,7 +5,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['IBM Plex Sans', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
       },
       colors: {
@@ -19,6 +19,10 @@ module.exports = {
         'accent-hover': '#2563eb',
         success: '#22c55e',
         'code-bg': '#0d0d0d',
+        coral: {
+          400: '#38bdb0',
+          500: '#2da89c',
+        },
       },
       borderRadius: {
         card: '8px',
