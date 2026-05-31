@@ -7,7 +7,7 @@ import os
 import re
 from typing import Any
 
-import google.generativeai as genai
+from google import genai
 
 
 SUMMARY_KEYS = (
@@ -36,12 +36,11 @@ Raw rows (JSON):
 """
 
 
-def _configure_gemini() -> genai.GenerativeModel:
+def _configure_gemini() -> genai.Client:
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("Missing GEMINI_API_KEY in environment")
-    genai.configure(api_key=api_key)
-    return genai.GenerativeModel("gemini-2.5-flash")
+    return genai.Client(api_key=api_key)
 
 
 def _extract_json(text: str) -> dict[str, Any]:
@@ -72,7 +71,7 @@ def _normalise(parsed: dict[str, Any]) -> dict[str, Any]:
 
 def summarise_rows(rows: list[dict[str, Any]], *, strict: bool = False) -> dict[str, Any]:
     """Call Gemini to summarise rows; retry once on invalid JSON."""
-    model = _configure_gemini()
+    client = _configure_gemini()
     rows_json = json.dumps(rows, default=str)
     prompt = _BASE_PROMPT.format(rows=rows_json)
     if strict:
@@ -84,7 +83,10 @@ def summarise_rows(rows: list[dict[str, Any]], *, strict: bool = False) -> dict[
     last_error: Exception | None = None
     for attempt in range(2):
         try:
-            response = model.generate_content(prompt if attempt == 0 else prompt + "\n\nRETRY: JSON only.")
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt if attempt == 0 else prompt + "\n\nRETRY: JSON only.",
+            )
             text = response.text or ""
             parsed = _extract_json(text)
             return _normalise(parsed)
