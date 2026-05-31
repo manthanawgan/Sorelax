@@ -18,8 +18,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from agent.coral_client import coral_query
-from agent.refresh import QUERIES_DIR, load_context, load_logs, load_on_demand_queries
+from agent.refresh import load_context, load_logs, run_ask_query
+from agent.source_health import source_health
 from sorelax_cli.scheduler import INTERVAL_HOURS, _pid_running, read_pid, stop_daemon
 
 AgentState = Literal["active", "idle", "stopped", "error"]
@@ -154,20 +154,7 @@ def _resolve_agent_state(*, scheduler_running: bool, has_context: bool) -> Agent
 
 
 def _source_health() -> dict[str, bool]:
-    health: dict[str, bool] = {}
-    for name in ("github", "linear", "slack", "notion"):
-        try:
-            result = subprocess.run(
-                ["coral", "source", "list"],
-                capture_output=True,
-                text=True,
-                timeout=15,
-            )
-            out = (result.stdout + result.stderr).lower()
-            health[name] = name in out and result.returncode == 0
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            health[name] = False
-    return health
+    return source_health()
 
 
 def _latest_source_counts() -> dict[str, int]:
@@ -375,12 +362,9 @@ def ask(body: AskRequest) -> AskResponse:
         )
 
     keyword = _extract_keyword(question)
-    # Coral does not support UNION; on_demand.sql is split into 5 part files
-    # executed separately by coral_query(), merged in Python.
-    sql_parts = load_on_demand_queries(owner=owner, repo=repo, keyword=keyword)
 
     try:
-        rows = coral_query(sql_parts)
+        rows = run_ask_query(owner=owner, repo=repo, keyword=keyword)
     except RuntimeError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
 

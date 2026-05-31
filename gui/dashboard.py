@@ -980,7 +980,7 @@ class SorelaxDashboard(QMainWindow):
             ("GITHUB_REPO", "GitHub Repo"),
             ("LINEAR_API_KEY", "Linear API Key"),
             ("SLACK_TOKEN", "Slack Bot Token"),
-            ("NOTION_TOKEN", "Notion Token"),
+            ("NOTION_API_KEY", "Notion API Key"),
             ("GEMINI_API_KEY", "Gemini API Key"),
         ]
 

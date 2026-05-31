@@ -16,6 +16,8 @@ import time
 from pathlib import Path
 from typing import Any, Callable
 
+from agent.source_health import source_health
+
 # Robust imports supporting both direct execution and package imports
 try:
     from sorelax_cli.scheduler import read_pid, _pid_running, next_refresh_iso, INTERVAL_HOURS
@@ -130,7 +132,7 @@ def save_env(tokens: dict[str, str]) -> None:
         "GITHUB_TOKEN",
         "LINEAR_API_KEY",
         "SLACK_TOKEN",
-        "NOTION_TOKEN",
+        "NOTION_API_KEY",
         "GEMINI_API_KEY",
     ]
 
@@ -148,7 +150,7 @@ def save_env(tokens: dict[str, str]) -> None:
         "github": "GITHUB_TOKEN",
         "linear": "LINEAR_API_KEY",
         "slack": "SLACK_TOKEN",
-        "notion": "NOTION_TOKEN",
+        "notion": "NOTION_API_KEY",
     }
 
     env = os.environ.copy()
@@ -228,7 +230,7 @@ def run_install(tokens: dict[str, str], line_callback: Callable[[str], None]) ->
         "github": "GITHUB_TOKEN",
         "linear": "LINEAR_API_KEY",
         "slack": "SLACK_TOKEN",
-        "notion": "NOTION_TOKEN",
+        "notion": "NOTION_API_KEY",
     }
     for name in sources:
         token = tokens.get(token_mapping[name], "")
@@ -338,19 +340,7 @@ def get_status() -> dict[str, Any]:
     next_r = next_refresh_iso() if pid else f"manual / every {INTERVAL_HOURS}h when daemon runs"
 
     # Direct source health check
-    health = {}
-    for name in ("github", "linear", "slack", "notion"):
-        try:
-            result = subprocess.run(
-                ["coral", "source", "list"],
-                capture_output=True,
-                text=True,
-                timeout=15,
-            )
-            out = (result.stdout + result.stderr).lower()
-            health[name.capitalize()] = name in out and result.returncode == 0
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            health[name.capitalize()] = False
+    health = {name.capitalize(): ok for name, ok in source_health().items()}
 
     return {
         "last_refresh": last,

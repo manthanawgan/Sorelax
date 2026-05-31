@@ -521,7 +521,7 @@ class ProgressPage(QWizardPage):
             "GITHUB_REPO": self.field("github_repo"),
             "LINEAR_API_KEY": self.field("linear_api_key"),
             "SLACK_TOKEN": self.field("slack_token"),
-            "NOTION_TOKEN": self.field("notion_token"),
+            "NOTION_API_KEY": self.field("notion_token"),
             "GEMINI_API_KEY": self.field("gemini_api_key"),
         }
 

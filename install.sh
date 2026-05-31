@@ -46,7 +46,7 @@ read -rp "GitHub owner (org/user): " GITHUB_OWNER
 read -rp "GitHub repo name: " GITHUB_REPO
 read -rp "Linear API key: " LINEAR_API_KEY
 read -rp "Slack bot token (xoxb-...): " SLACK_TOKEN
-read -rp "Notion integration token: " NOTION_TOKEN
+read -rp "Notion integration token: " NOTION_API_KEY
 read -rp "Gemini API key: " GEMINI_API_KEY
 
 cat > "${ENV_FILE}" <<EOF
@@ -55,7 +55,7 @@ GITHUB_REPO=${GITHUB_REPO}
 GITHUB_TOKEN=${GITHUB_TOKEN}
 LINEAR_API_KEY=${LINEAR_API_KEY}
 SLACK_TOKEN=${SLACK_TOKEN}
-NOTION_TOKEN=${NOTION_TOKEN}
+NOTION_API_KEY=${NOTION_API_KEY}
 GEMINI_API_KEY=${GEMINI_API_KEY}
 EOF
 chmod 600 "${ENV_FILE}"
@@ -66,7 +66,7 @@ echo "Adding Coral sources..."
 coral source add github --token "${GITHUB_TOKEN}" 2>/dev/null || coral source add github || true
 coral source add linear --token "${LINEAR_API_KEY}" 2>/dev/null || coral source add linear || true
 coral source add slack --token "${SLACK_TOKEN}" 2>/dev/null || coral source add slack || true
-coral source add notion --token "${NOTION_TOKEN}" 2>/dev/null || coral source add notion || true
+coral source add notion --token "${NOTION_API_KEY}" 2>/dev/null || coral source add notion || true
 
 echo ""
 echo "==> Setting up Hermes Agent..."

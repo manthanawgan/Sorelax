@@ -108,7 +108,7 @@ curl -fsSL https://withcoral.com/install.sh | sh
 coral source add github --token <GITHUB_TOKEN>
 coral source add linear --token <LINEAR_API_KEY>
 coral source add slack  --token <SLACK_TOKEN>
-coral source add notion --token <NOTION_TOKEN>
+coral source add notion --token <NOTION_API_KEY>
 ```
 
 ### 3 — After install (Hermes scheduler)
@@ -289,7 +289,7 @@ Sorelax/
 | `GITHUB_TOKEN` | for Coral | GitHub source authentication |
 | `LINEAR_API_KEY` | for Coral | Linear source |
 | `SLACK_TOKEN` | for Coral | Slack source (`xoxb-…`) |
-| `NOTION_TOKEN` | for Coral | Notion source |
+| `NOTION_API_KEY` | for Coral | Notion source |
 
 Copy `.env.example` to `.env` and fill in your values:
 

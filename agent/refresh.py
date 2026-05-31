@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 
 from agent.coral_client import coral_query
 from agent.generate_context import write_claude_md
+from agent.slack_coral import fetch_slack_rows_for_refresh, search_slack_for_ask
 from agent.summariser import summarise_rows
 
 SORELAX_DIR = Path.home() / ".sorelax"
@@ -39,23 +40,29 @@ def _load_sql(name: str, **subs: str) -> str:
 
 
 def load_on_demand_queries(owner: str, repo: str, keyword: str) -> list[str]:
-    """Return the 5 on_demand part queries with placeholders substituted.
+    """Return on_demand SQL parts with placeholders substituted.
 
     Coral does not support UNION / UNION ALL.  The original on_demand.sql has
-    been split into on_demand_part1.sql … on_demand_part5.sql.  Each part is
-    executed separately by coral_query() and the rows are merged in Python.
+    been split into part files executed separately and merged in Python.
+    Slack (part 4) is queried per-channel via agent.slack_coral — not SQL.
     """
     parts = [
         "on_demand_part1.sql",
         "on_demand_part2.sql",
         "on_demand_part3.sql",
-        "on_demand_part4.sql",
         "on_demand_part5.sql",
     ]
     return [
         _load_sql(part, owner=owner, repo=repo, keyword=keyword)
         for part in parts
     ]
+
+
+def run_ask_query(owner: str, repo: str, keyword: str) -> list[dict[str, Any]]:
+    """Run on-demand keyword search across Coral sources including Slack."""
+    rows = coral_query(load_on_demand_queries(owner=owner, repo=repo, keyword=keyword))
+    rows.extend(search_slack_for_ask(keyword))
+    return rows
 
 
 def _check_env() -> None:
@@ -146,6 +153,7 @@ def run_refresh(
             on_source_progress(name, (i + 1) / len(sources) * 0.5, "querying…")
 
     rows = coral_query(sql)
+    rows.extend(fetch_slack_rows_for_refresh())
     elapsed = time.perf_counter() - t0
 
     if on_source_progress:

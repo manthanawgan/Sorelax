@@ -255,7 +255,7 @@ curl -fsSL https://raw.githubusercontent.com/NousResearch/hermes-agent/main/scri
                       { token: 'GITHUB_TOKEN', url: 'github.com/settings/tokens', scope: 'repo, read:org — Coral source' },
                       { token: 'LINEAR_API_KEY', url: 'linear.app/settings/api', scope: 'read — Coral source' },
                       { token: 'SLACK_TOKEN', url: 'api.slack.com/apps', scope: 'xoxb-… bot token — Coral source' },
-                      { token: 'NOTION_TOKEN', url: 'notion.so/my-integrations', scope: 'read — Coral source' },
+                      { token: 'NOTION_API_KEY', url: 'notion.so/my-integrations', scope: 'read — Coral source' },
                       { token: 'GEMINI_API_KEY', url: 'aistudio.google.com', scope: 'required for summarisation' },
                     ].map((row, i, arr) => (
                       <tr key={row.token} className={i < arr.length - 1 ? 'border-b border-border' : ''}>
@@ -328,7 +328,7 @@ GITHUB_REPO=your-repo
 GITHUB_TOKEN=ghp_xxxxxxxxxxxx
 LINEAR_API_KEY=lin_api_xxxxxxxx
 SLACK_TOKEN=xoxb-xxxxxxxxxx
-NOTION_TOKEN=secret_xxxxxxxxxx
+NOTION_API_KEY=secret_xxxxxxxxxx
 GEMINI_API_KEY=AIzaSyxxxxxxxxxx`}
               className="mb-4"
             />

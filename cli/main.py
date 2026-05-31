@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import os
 import re
-import subprocess
 import sys
 import threading
 import time
@@ -13,15 +12,14 @@ from pathlib import Path
 import typer
 from dotenv import load_dotenv
 
-from agent.coral_client import coral_query
 from agent.refresh import (
     CONTEXT_PATH,
-    QUERIES_DIR,
     load_context,
     load_logs,
-    load_on_demand_queries,
+    run_ask_query,
     run_refresh,
 )
+from agent.source_health import source_health
 from sorelax_cli import display
 from sorelax_cli.scheduler import (
     INTERVAL_HOURS,
@@ -54,20 +52,7 @@ def _extract_keyword(question: str) -> str:
 
 
 def _source_health() -> dict[str, bool]:
-    health: dict[str, bool] = {}
-    for name in ("github", "linear", "slack", "notion"):
-        try:
-            result = subprocess.run(
-                ["coral", "source", "list"],
-                capture_output=True,
-                text=True,
-                timeout=15,
-            )
-            out = (result.stdout + result.stderr).lower()
-            health[name.capitalize()] = name in out and result.returncode == 0
-        except (subprocess.TimeoutExpired, FileNotFoundError):
-            health[name.capitalize()] = False
-    return health
+    return {name.capitalize(): ok for name, ok in source_health().items()}
 
 
 @app.command()
@@ -146,12 +131,9 @@ def ask(question: str = typer.Argument(..., help="Natural-language question")) -
         raise typer.Exit(1)
 
     keyword = _extract_keyword(question)
-    # Coral does not support UNION; on_demand.sql is split into 5 part files
-    # executed separately by coral_query(), merged in Python.
-    sql_parts = load_on_demand_queries(owner=owner, repo=repo, keyword=keyword)
 
     try:
-        rows = coral_query(sql_parts)
+        rows = run_ask_query(owner=owner, repo=repo, keyword=keyword)
         display.show_ask_result(question, rows)
         display.console.print(f"\n[dim]Keyword: {keyword}[/dim]")
     except RuntimeError as exc:
