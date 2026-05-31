@@ -182,12 +182,12 @@ export default function LandingPage() {
             >
               View on GitHub
             </Link>
-            <Link
+            {/* <Link
               to="/dashboard"
               className="px-5 py-2.5 rounded-button border border-border text-text-secondary text-sm hover:border-text-tertiary hover:text-white transition-all duration-200"
             >
               Dashboard
-            </Link>
+            </Link> */}
           </motion.div>
         </div>
       </section>
