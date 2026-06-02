@@ -23,7 +23,11 @@ Sorelax is an autonomous background agent that queries **GitHub**, **Linear**, *
 
 ## Architecture
 
-```
+<p align="center">
+  <img alt="pastel architecture" src="https://raw.githubusercontent.com/manthanawgan/sorelax/main/assets/image.png" width="900" />
+</p>
+
+<!-- ```
 ┌─────────────────┐     every 6h      ┌──────────────────┐
 │  hermes gateway │ ────────────────► │ sorelax-refresh  │
 │  (cron daemon)  │                   │ skill (SKILL.md) │
@@ -47,7 +51,7 @@ Sorelax is an autonomous background agent that queries **GitHub**, **Linear**, *
                                     │  Website / GUI       │
                                     │  localhost:5173      │
                                     └──────────────────────┘
-```
+``` -->
 
 ---
 
